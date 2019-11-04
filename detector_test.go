@@ -1,7 +1,7 @@
 package chardet_test
 
 import (
-	"github.com/saintfish/chardet"
+	"github.com/gogs/chardet"
 	"io"
 	"os"
 	"path/filepath"

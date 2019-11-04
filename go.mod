@@ -1,1 +1,1 @@
-module github.com/saintfish/chardet
+module github.com/gogs/chardet

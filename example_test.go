@@ -2,7 +2,7 @@ package chardet_test
 
 import (
 	"fmt"
-	"github.com/saintfish/chardet"
+	"github.com/gogs/chardet"
 )
 
 var (
