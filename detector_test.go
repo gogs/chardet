@@ -1,6 +1,7 @@
 package chardet_test
 
 import (
+	"bytes"
 	"github.com/gogs/chardet"
 	"io"
 	"os"
@@ -56,5 +57,14 @@ func TestDetector(t *testing.T) {
 		if result.Language != d.Language {
 			t.Errorf("Expected language %s, actual %s", d.Language, result.Language)
 		}
+	}
+}
+
+func BenchmarkDetectBest(b *testing.B) {
+	textDetector := chardet.NewTextDetector()
+	aaaa := bytes.Repeat([]byte("A"), 1024)
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		textDetector.DetectBest(aaaa)
 	}
 }
