@@ -9,10 +9,11 @@ type recognizer2022 struct {
 	escapes [][]byte
 }
 
-func (r *recognizer2022) Match(input *recognizerInput) (output recognizerOutput) {
+func (r *recognizer2022) Match(input *recognizerInput, order int) (output recognizerOutput) {
 	return recognizerOutput{
 		Charset:    r.charset,
 		Confidence: r.matchConfidence(input.input),
+		order:      order,
 	}
 }
 

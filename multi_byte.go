@@ -16,11 +16,12 @@ type charDecoder interface {
 	DecodeOneChar([]byte) (c uint16, remain []byte, err error)
 }
 
-func (r *recognizerMultiByte) Match(input *recognizerInput) (output recognizerOutput) {
+func (r *recognizerMultiByte) Match(input *recognizerInput, order int) (output recognizerOutput) {
 	return recognizerOutput{
 		Charset:    r.charset,
 		Language:   r.language,
 		Confidence: r.matchConfidence(input),
+		order:      order,
 	}
 }
 

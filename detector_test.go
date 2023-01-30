@@ -2,11 +2,12 @@ package chardet_test
 
 import (
 	"bytes"
-	"github.com/gogs/chardet"
 	"io"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/gogs/chardet"
 )
 
 func TestDetector(t *testing.T) {
@@ -57,6 +58,28 @@ func TestDetector(t *testing.T) {
 		if result.Language != d.Language {
 			t.Errorf("Expected language %s, actual %s", d.Language, result.Language)
 		}
+	}
+
+	// "ノエル" Shift JIS encoded
+	test := []byte("\x83m\x83G\x83\x8b")
+
+	result, err := textDetector.DetectAll(test)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(result) != 3 {
+		t.Errorf("Expected 3 results, actual %d", len(result))
+	}
+	if result[0].Charset != "Shift_JIS" || result[1].Charset != "GB18030" || result[2].Charset != "Big5" {
+		t.Errorf("DetectAll order is wrong: %v", result)
+	}
+
+	singleResult, err := textDetector.DetectBest(test)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if singleResult.Charset != "Shift_JIS" {
+		t.Errorf("DetectBest result is wrong: %v", singleResult)
 	}
 }
 

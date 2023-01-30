@@ -9,7 +9,7 @@ type recognizerSingleByte struct {
 	ngram            *[64]uint32
 }
 
-func (r *recognizerSingleByte) Match(input *recognizerInput) recognizerOutput {
+func (r *recognizerSingleByte) Match(input *recognizerInput, order int) recognizerOutput {
 	var charset string = r.charset
 	if input.hasC1Bytes && len(r.hasC1ByteCharset) > 0 {
 		charset = r.hasC1ByteCharset
@@ -18,6 +18,7 @@ func (r *recognizerSingleByte) Match(input *recognizerInput) recognizerOutput {
 		Charset:    charset,
 		Language:   r.language,
 		Confidence: r.parseNgram(input.input),
+		order:      order,
 	}
 }
 

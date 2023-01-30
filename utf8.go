@@ -13,9 +13,10 @@ func newRecognizer_utf8() *recognizerUtf8 {
 	return &recognizerUtf8{}
 }
 
-func (*recognizerUtf8) Match(input *recognizerInput) (output recognizerOutput) {
+func (*recognizerUtf8) Match(input *recognizerInput, order int) (output recognizerOutput) {
 	output = recognizerOutput{
 		Charset: "UTF-8",
+		order:   order,
 	}
 	hasBom := bytes.HasPrefix(input.raw, utf8Bom)
 	inputLen := len(input.raw)
