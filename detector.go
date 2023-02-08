@@ -14,6 +14,9 @@ type Result struct {
 	Language string
 	// Confidence of the Result. Scale from 1 to 100. The bigger, the more confident.
 	Confidence int
+
+	// used for sorting internally
+	order int
 }
 
 // Detector implements charset detection.
@@ -87,13 +90,13 @@ var (
 func (d *Detector) DetectBest(b []byte) (r *Result, err error) {
 	input := newRecognizerInput(b, d.stripTag)
 	outputChan := make(chan recognizerOutput)
-	for _, r := range d.recognizers {
-		go matchHelper(r, input, outputChan)
+	for i, r := range d.recognizers {
+		go matchHelper(r, input, outputChan, i)
 	}
 	var output Result
 	for i := 0; i < len(d.recognizers); i++ {
 		o := <-outputChan
-		if output.Confidence < o.Confidence {
+		if output.Confidence < o.Confidence || (output.Confidence == o.Confidence && o.order < output.order) {
 			output = Result(o)
 		}
 	}
@@ -107,8 +110,8 @@ func (d *Detector) DetectBest(b []byte) (r *Result, err error) {
 func (d *Detector) DetectAll(b []byte) ([]Result, error) {
 	input := newRecognizerInput(b, d.stripTag)
 	outputChan := make(chan recognizerOutput)
-	for _, r := range d.recognizers {
-		go matchHelper(r, input, outputChan)
+	for i, r := range d.recognizers {
+		go matchHelper(r, input, outputChan, i)
 	}
 	outputs := make(recognizerOutputs, 0, len(d.recognizers))
 	for i := 0; i < len(d.recognizers); i++ {
@@ -136,12 +139,14 @@ func (d *Detector) DetectAll(b []byte) ([]Result, error) {
 	return dedupOutputs, nil
 }
 
-func matchHelper(r recognizer, input *recognizerInput, outputChan chan<- recognizerOutput) {
-	outputChan <- r.Match(input)
+func matchHelper(r recognizer, input *recognizerInput, outputChan chan<- recognizerOutput, order int) {
+	outputChan <- r.Match(input, order)
 }
 
 type recognizerOutputs []recognizerOutput
 
-func (r recognizerOutputs) Len() int           { return len(r) }
-func (r recognizerOutputs) Less(i, j int) bool { return r[i].Confidence > r[j].Confidence }
-func (r recognizerOutputs) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
+func (r recognizerOutputs) Len() int { return len(r) }
+func (r recognizerOutputs) Less(i, j int) bool {
+	return r[i].Confidence > r[j].Confidence || (r[i].Confidence == r[j].Confidence && r[i].order < r[j].order)
+}
+func (r recognizerOutputs) Swap(i, j int) { r[i], r[j] = r[j], r[i] }

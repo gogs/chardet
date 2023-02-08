@@ -18,9 +18,10 @@ func newRecognizer_utf16be() *recognizerUtf16be {
 	return &recognizerUtf16be{}
 }
 
-func (*recognizerUtf16be) Match(input *recognizerInput) (output recognizerOutput) {
+func (*recognizerUtf16be) Match(input *recognizerInput, order int) (output recognizerOutput) {
 	output = recognizerOutput{
 		Charset: "UTF-16BE",
+		order:   order,
 	}
 	if bytes.HasPrefix(input.raw, utf16beBom) {
 		output.Confidence = 100
@@ -35,9 +36,10 @@ func newRecognizer_utf16le() *recognizerUtf16le {
 	return &recognizerUtf16le{}
 }
 
-func (*recognizerUtf16le) Match(input *recognizerInput) (output recognizerOutput) {
+func (*recognizerUtf16le) Match(input *recognizerInput, order int) (output recognizerOutput) {
 	output = recognizerOutput{
 		Charset: "UTF-16LE",
+		order:   order,
 	}
 	if bytes.HasPrefix(input.raw, utf16leBom) && !bytes.HasPrefix(input.raw, utf32leBom) {
 		output.Confidence = 100
@@ -75,9 +77,10 @@ func newRecognizer_utf32le() *recognizerUtf32 {
 	}
 }
 
-func (r *recognizerUtf32) Match(input *recognizerInput) (output recognizerOutput) {
+func (r *recognizerUtf32) Match(input *recognizerInput, order int) (output recognizerOutput) {
 	output = recognizerOutput{
 		Charset: r.name,
+		order:   order,
 	}
 	hasBom := bytes.HasPrefix(input.raw, r.bom)
 	var numValid, numInvalid uint32
